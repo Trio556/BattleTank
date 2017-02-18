@@ -41,7 +41,7 @@ void ATankPlayerController::AimTowardsCrosshair()
 
 	if (GetSightRayHitLocation(HitLocation)) // Is going to Line Trace
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Look Direction: %s"), *HitLocation.ToString());
+		GetControlledTank()->AimAt(HitLocation);
 
 		//TODO Tell controlled tank to aim at this point
 	}
