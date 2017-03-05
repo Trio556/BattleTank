@@ -10,5 +10,5 @@ void UTankTurrent::Rotate(float RelativeSpeed)
 	auto NewRotation = RelativeRotation.Yaw + RotationChange;
 
 	SetRelativeRotation(FRotator(0, NewRotation, 0));
-	UE_LOG(LogTemp, Warning, TEXT("Rotation Change: %f | RawNewRotation: %f"), RotationChange, NewRotation);
+	//UE_LOG(LogTemp, Warning, TEXT("Rotation Change: %f | RawNewRotation: %f"), RotationChange, NewRotation);
 }
