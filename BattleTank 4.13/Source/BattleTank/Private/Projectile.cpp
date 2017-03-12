@@ -29,9 +29,7 @@ void AProjectile::Tick( float DeltaTime )
 }
 
 void AProjectile::LaunchProjectile(float Speed)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Speed %f"), Speed);
-	
+{	
 	TankProjectile->SetVelocityInLocalSpace(FVector::ForwardVector * Speed);
 
 	TankProjectile->Activate(true);

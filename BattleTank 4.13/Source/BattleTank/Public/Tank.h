@@ -8,6 +8,7 @@
 class UTankBarrel; //Forward Declaration
 class UTankAimingComponent;
 class UTankTurrent;
+class UTankTrack;
 class AProjectile;
 
 UCLASS()
@@ -23,6 +24,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Setup)
 		void SetTurrentReference(UTankTurrent* TurrentToSet);
+
+	UFUNCTION(BlueprintCallable, Category = Setup)
+		void SetRightTrackReference(UTankTrack* RightTrackToSet);
+
+	UFUNCTION(BlueprintCallable, Category = Setup)
+		void SetLeftTrackReference(UTankTrack* LeftTrackToSet);
 
 	UFUNCTION(BlueprintCallable, Category = Action)
 		void Fire();
@@ -49,6 +56,11 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Setup)
 		TSubclassOf<AProjectile> ProjectileBlueprint;
+
+	//Tracks that the tank will use
+	UTankTrack* RightTrack = nullptr;
+	UTankTrack* LeftTrack = nullptr;
+
 
 	//Barrel reference for Projectile
 	UTankBarrel* Barrel = nullptr;

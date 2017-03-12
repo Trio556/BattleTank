@@ -28,6 +28,16 @@ void ATank::SetTurrentReference(UTankTurrent* TurrentToSet)
 	TankAimingComponent->SetTurrentReference(TurrentToSet);
 }
 
+void ATank::SetRightTrackReference(UTankTrack* RightTrackToSet)
+{
+	RightTrack = RightTrackToSet;
+}
+
+void ATank::SetLeftTrackReference(UTankTrack* LeftTrackToSet)
+{
+	LeftTrack = LeftTrackToSet;
+}
+
 // Called when the game starts or when spawned
 void ATank::BeginPlay()
 {
