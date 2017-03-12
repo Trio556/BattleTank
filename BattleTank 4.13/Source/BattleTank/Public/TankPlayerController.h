@@ -24,14 +24,14 @@ public:
 private:
 
 	//Relative position of the crosshair in the X plane
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 		float CrossHairXLocation = 0.5f;
 
 	//Relative position of the crosshair in the Y Plane
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 		float CrossHairYLocation = 0.3333f;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 		float LineTraceRange = 1000000;
 
 	ATank* GetControlledTank() const;
