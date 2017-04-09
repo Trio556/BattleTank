@@ -30,7 +30,9 @@ void AProjectile::Tick( float DeltaTime )
 
 void AProjectile::LaunchProjectile(float Speed)
 {	
-	TankProjectile->SetVelocityInLocalSpace(FVector::ForwardVector * Speed);
-
-	TankProjectile->Activate(true);
+	if (ensure(TankProjectile))
+	{
+		TankProjectile->SetVelocityInLocalSpace(FVector::ForwardVector * Speed);
+		TankProjectile->Activate(true);
+	}
 }

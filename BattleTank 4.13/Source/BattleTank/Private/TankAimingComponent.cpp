@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BattleTank.h"
+#include "Public/Projectile.h"
 #include "Public/TankBarrel.h"
 #include "Public/TankTurrent.h"
 #include "Public/TankAimingComponent.h"
@@ -65,4 +66,23 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 
 	Barrel->Elevate(DeltaRotator.Pitch);
 	Turrent->Rotate(DeltaRotator.Yaw);
+}
+
+void UTankAimingComponent::Fire()
+{
+	bool isReloaded = (FPlatformTime::Seconds() - LastFireTime) > ReloadTimeInSeconds;
+
+	if (isReloaded && ensure(Barrel))
+	{
+		//Spawn Projectile at barrels projectile socket
+		auto ProjectileSocketLocation = Barrel->GetSocketLocation(FName("Projectile"));
+		auto ProjectileSocketRotation = Barrel->GetSocketRotation(FName("Projectile"));
+		FActorSpawnParameters ProjectileSpawnParams;
+
+		auto Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileBlueprint, ProjectileSocketLocation, ProjectileSocketRotation, ProjectileSpawnParams);
+
+		Projectile->LaunchProjectile(LaunchSpeed);
+
+		LastFireTime = FPlatformTime::Seconds();
+	}
 }

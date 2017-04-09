@@ -28,6 +28,6 @@ void ATankAIController::Tick(float DeltaSeconds)
 		AimingComponent->AimAt(PlayerTank->GetActorLocation());
 
 		//Fire if Ready
-		//ControlledTank->Fire();// TODO: limit firing rate
+		AimingComponent->Fire();// TODO: limit firing rate
 	}
 }
