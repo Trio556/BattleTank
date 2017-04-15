@@ -17,6 +17,23 @@ UTankAimingComponent::UTankAimingComponent()
 	// ...
 }
 
+void UTankAimingComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//There is no point to this in my project since I initilize the value in the header
+	//but they added it in the tutorial so I figured I would follow along for now.
+	LastFireTime = 0;
+}
+
+void UTankAimingComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
+{
+	if ((FPlatformTime::Seconds() - LastFireTime) > ReloadTimeInSeconds)
+	{
+		FiringStatus = EFiringState::Reloading;
+	}
+}
+
 void UTankAimingComponent::Initialize(UTankBarrel* BarrelToSet, UTankTurrent* TurrentToSet)
 {
 	Barrel = BarrelToSet;
@@ -70,14 +87,15 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 
 void UTankAimingComponent::Fire()
 {
-	bool isReloaded = (FPlatformTime::Seconds() - LastFireTime) > ReloadTimeInSeconds;
 
-	if (isReloaded && ensure(Barrel))
+	if (FiringStatus != EFiringState::Reloading && ensure(Barrel))
 	{
 		//Spawn Projectile at barrels projectile socket
 		auto ProjectileSocketLocation = Barrel->GetSocketLocation(FName("Projectile"));
 		auto ProjectileSocketRotation = Barrel->GetSocketRotation(FName("Projectile"));
 		FActorSpawnParameters ProjectileSpawnParams;
+
+		if (!ensure(ProjectileBlueprint)) { return; }
 
 		auto Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileBlueprint, ProjectileSocketLocation, ProjectileSocketRotation, ProjectileSpawnParams);
 
