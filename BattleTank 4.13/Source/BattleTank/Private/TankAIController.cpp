@@ -27,7 +27,10 @@ void ATankAIController::Tick(float DeltaSeconds)
 		//Aim towards the player
 		AimingComponent->AimAt(PlayerTank->GetActorLocation());
 
-		//Fire if Ready
-		AimingComponent->Fire();// TODO: limit firing rate
+		if (AimingComponent->GetFiringState() == EFiringState::Locked)
+		{
+			//Fire if Ready
+			AimingComponent->Fire();// TODO: limit firing rate
+		}
 	}
 }

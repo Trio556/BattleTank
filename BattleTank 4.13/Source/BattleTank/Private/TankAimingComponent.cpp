@@ -19,25 +19,51 @@ UTankAimingComponent::UTankAimingComponent()
 
 void UTankAimingComponent::BeginPlay()
 {
-	Super::BeginPlay();
-
-	//There is no point to this in my project since I initilize the value in the header
-	//but they added it in the tutorial so I figured I would follow along for now.
-	LastFireTime = 0;
-}
-
-void UTankAimingComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
-{
-	if ((FPlatformTime::Seconds() - LastFireTime) > ReloadTimeInSeconds)
-	{
-		FiringStatus = EFiringState::Reloading;
-	}
+	LastFireTime = FPlatformTime::Seconds();
 }
 
 void UTankAimingComponent::Initialize(UTankBarrel* BarrelToSet, UTankTurrent* TurrentToSet)
 {
 	Barrel = BarrelToSet;
 	Turrent = TurrentToSet;
+}
+
+void UTankAimingComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
+{
+	if ((FPlatformTime::Seconds() - LastFireTime) < ReloadTimeInSeconds)
+	{
+		FiringStatus = EFiringState::Reloading;
+	}
+	else if (RoundsLeft <= 0)
+	{
+		FiringStatus = EFiringState::OutOfAmmo;
+	}
+	else if (IsBarrelMoving())
+	{
+		FiringStatus = EFiringState::Aiming;
+	}
+	else
+	{
+		FiringStatus = EFiringState::Locked;
+	}
+}
+
+int UTankAimingComponent::GetRoundsLeft() const
+{
+	return RoundsLeft;
+}
+
+EFiringState UTankAimingComponent::GetFiringState() const
+{
+	return FiringStatus;
+}
+
+bool UTankAimingComponent::IsBarrelMoving()
+{
+	if (!ensure(Barrel)) { return false; }
+
+	auto BarrelForward = Barrel->GetForwardVector();
+	return !BarrelForward.Equals(AimDirection, 0.01);
 }
 
 void UTankAimingComponent::AimAt(FVector HitLocation)
@@ -67,12 +93,12 @@ void UTankAimingComponent::AimAt(FVector HitLocation)
 	//Calculate the out launch velocity
 	if (bHasAimSolution)
 	{
-		auto AimDirection = OutLaunchVelocity.GetSafeNormal();
-		MoveBarrelTowards(AimDirection);
+		AimDirection = OutLaunchVelocity.GetSafeNormal();
+		MoveBarrelTowards();
 	}
 }
 
-void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
+void UTankAimingComponent::MoveBarrelTowards()
 {
 	if (!ensure(Barrel && Turrent)) { return; }
 
@@ -82,24 +108,33 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 	auto DeltaRotator = AimAsRotator - BarrelRotator;
 
 	Barrel->Elevate(DeltaRotator.Pitch);
-	Turrent->Rotate(DeltaRotator.Yaw);
+
+	auto DeltaYaw = DeltaRotator.Yaw;
+
+	if (DeltaYaw > 180 || DeltaYaw < -180) //Lecture Code (I like mine better): FMath::Abs(DeltaRotator.Yaw)
+	{
+		DeltaYaw *= -1; //Turrent->Rotate(DeltaRotator.Yaw)
+	}
+	//else Turrent->Rotate(-DeltaRotator.Yaw):End Lecture Code
+
+	Turrent->Rotate(DeltaYaw);
 }
 
 void UTankAimingComponent::Fire()
 {
-
-	if (FiringStatus != EFiringState::Reloading && ensure(Barrel))
+	if (FiringStatus == EFiringState::Aiming || FiringStatus == EFiringState::Locked)
 	{
+		if (!ensure(Barrel)) { return; }
+		if (!ensure(ProjectileBlueprint)) { return; }
 		//Spawn Projectile at barrels projectile socket
 		auto ProjectileSocketLocation = Barrel->GetSocketLocation(FName("Projectile"));
 		auto ProjectileSocketRotation = Barrel->GetSocketRotation(FName("Projectile"));
 		FActorSpawnParameters ProjectileSpawnParams;
 
-		if (!ensure(ProjectileBlueprint)) { return; }
-
 		auto Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileBlueprint, ProjectileSocketLocation, ProjectileSocketRotation, ProjectileSpawnParams);
 
 		Projectile->LaunchProjectile(LaunchSpeed);
+		--RoundsLeft;
 
 		LastFireTime = FPlatformTime::Seconds();
 	}
