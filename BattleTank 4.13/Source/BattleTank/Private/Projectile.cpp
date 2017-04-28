@@ -16,7 +16,7 @@ AProjectile::AProjectile()
 	CollisionMesh->SetVisibility(false);
 
 	LaunchBlast = CreateDefaultSubobject<UParticleSystemComponent>(FName("Launch Blast"));
-	//LaunchBlast->AttachTo(RootComponent); //This is causing the properties to disappear so I am leaving this commented out for now.
+	LaunchBlast->AttachTo(RootComponent); //This is causing the properties to disappear so I am leaving this commented out for now.
 
 	TankProjectile = CreateDefaultSubobject<UProjectileMovementComponent>(FName("Projectile Movement Component"));
 	TankProjectile->bAutoActivate = 0;
