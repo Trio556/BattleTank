@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BattleTank.h"
+#include "Public/Tank.h"
 #include "Public/TankAimingComponent.h"
 #include "Public/TankPlayerController.h"
 
@@ -83,4 +84,23 @@ bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVec
 
 	HitLocation = FVector(0);
 	return false;
+}
+
+void ATankPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+
+	if (InPawn)
+	{
+		auto PlayerTank = Cast<ATank>(InPawn);
+		if (!ensure(PlayerTank)) { return; }
+
+		//Subscribe to our local method to the tank's death event
+		PlayerTank->OnDeath.AddUniqueDynamic(this, &ATankPlayerController::OnPlayerDeath);
+	}
+}
+
+void ATankPlayerController::OnPlayerDeath()
+{
+	StartSpectatingOnly();
 }

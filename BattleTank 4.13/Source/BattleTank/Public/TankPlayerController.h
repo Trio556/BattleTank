@@ -28,6 +28,8 @@ protected:
 
 private:
 
+	virtual void SetPawn(APawn* InPawn) override;
+
 	//Relative position of the crosshair in the X plane
 	UPROPERTY(EditDefaultsOnly)
 		float CrossHairXLocation = 0.5f;
@@ -50,4 +52,7 @@ private:
 
 	//Get's a hit location of where you are looking
 	bool GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const;
+
+	UFUNCTION()
+		void OnPlayerDeath();
 };
