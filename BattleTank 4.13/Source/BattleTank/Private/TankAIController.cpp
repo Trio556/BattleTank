@@ -19,7 +19,7 @@ void ATankAIController::Tick(float DeltaSeconds)
 	auto ControlledTank = GetPawn();
 	auto PlayerTank = GetWorld()->GetFirstPlayerController()->GetPawn();
 
-	if (ensure(PlayerTank && ControlledTank))
+	if (PlayerTank && ControlledTank)
 	{
 		//Move towards the player
 		MoveToActor(PlayerTank, AcceptanceRadius);
@@ -52,5 +52,7 @@ void ATankAIController::SetPawn(APawn* InPawn)
 
 void ATankAIController::OnPossessedTankDeath()
 {
-	DetachFromControllerPendingDestroy(this);
+	if (!GetPawn()) { return; }
+
+	GetPawn()->DetachFromControllerPendingDestroy();
 }

@@ -10,6 +10,13 @@ ATank::ATank()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
+void ATank::BeginPlay()
+{
+	Super::BeginPlay();
+
+	TankHealth = StartingHealth;
+}
+
 float ATank::GetHealthPercent() const
 {
 	return (float)TankHealth / (float)StartingHealth;
@@ -20,7 +27,7 @@ float ATank::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEv
 	int32 DamagePoints = FPlatformMath::RoundToInt(DamageAmount);
 	int32 DamageToApply = FMath::Clamp(DamagePoints, 0, TankHealth);
 
-	TankHealth = FMath::Clamp(TankHealth - DamagePoints, 0, 100);
+	TankHealth = FMath::Clamp(TankHealth - DamagePoints, 0, StartingHealth);
 
 	if (TankHealth <= 0)
 	{
